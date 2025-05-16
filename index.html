@@ -43,11 +43,17 @@
 
     // iOS Native에서 호출할 함수 (response 전달용)
     window.NativeInterface = {
-      onDeviceInfoResponse: function(info) {
-        const infoText = JSON.stringify(info, null, 2);
-        document.getElementById('deviceInfo').innerText = infoText;
-      }
-    };
+  onDeviceInfoResponse: function(info) {
+    try {
+      const infoText = JSON.stringify(info, null, 2);
+      document.getElementById('deviceInfo').innerText = infoText;
+    } catch (e) {
+      // info가 객체가 아니거나 JSON.stringify 실패 시, 그대로 출력
+      document.getElementById('deviceInfo').innerText = String(info);
+    }
+  }
+};
+
   </script>
 </body>
 </html>
