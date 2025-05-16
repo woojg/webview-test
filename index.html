@@ -34,19 +34,20 @@
 
   <script>
     function requestDeviceInfo() {
-      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.getDeviceInfo) {
-        // iOS Native 호출
+      if (window.webkit?.messageHandlers?.getDeviceInfo) {
         window.webkit.messageHandlers.getDeviceInfo.postMessage(null);
       } else {
         document.getElementById('deviceInfo').innerText = "getDeviceInfo() is not available.";
       }
     }
 
-    // Native에서 호출될 함수
-    function onDeviceInfoResponse(info) {
-      const infoText = JSON.stringify(info, null, 2);
-      document.getElementById('deviceInfo').innerText = infoText;
-    }
+    // iOS Native에서 호출할 함수 (response 전달용)
+    window.NativeInterface = {
+      onDeviceInfoResponse: function(info) {
+        const infoText = JSON.stringify(info, null, 2);
+        document.getElementById('deviceInfo').innerText = infoText;
+      }
+    };
   </script>
 </body>
 </html>
