@@ -1,59 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Device Info Viewer</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 20px;
-    }
-    #deviceInfo {
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background: #f9f9f9;
-      white-space: pre-wrap;
-    }
-    button {
-      margin-top: 20px;
-      padding: 8px 12px;
-      font-size: 16px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>QR 이미지 미리보기 & 저장</title>
 </head>
 <body>
-  <h1>📱 Device Info</h1>
+    <h1>QR 이미지 미리보기 & 저장</h1>
 
-  <button onclick="requestDeviceInfo()">Get Device Info</button>
+    <button id="save-button">QR 이미지 저장</button>
+    <br/><br/>
 
-  <div id="deviceInfo">No device info yet.</div>
+    <img id="preview" alt="QR 미리보기" width="200" height="200" style="border:1px solid #ccc;" />
 
-  <script>
-    function requestDeviceInfo() {
-      if (window.webkit?.messageHandlers?.getDeviceInfo) {
-        window.webkit.messageHandlers.getDeviceInfo.postMessage(null);
-      } else {
-        document.getElementById('deviceInfo').innerText = "getDeviceInfo() is not available.";
-      }
-    }
+    <script>
+        document.getElementById("save-button").addEventListener("click", async () => {
+            try {
+                // 1. QR 이미지 URL (샘플 QR 코드)
+                const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?data=HelloMyrealtrip&size=200x200";
 
-    // iOS Native에서 호출할 함수 (response 전달용)
-    window.NativeInterface = {
-  onDeviceInfoResponse: function(info) {
-    try {
-      const infoText = JSON.stringify(info, null, 2);
-      document.getElementById('deviceInfo').innerText = infoText;
-    } catch (e) {
-      // info가 객체가 아니거나 JSON.stringify 실패 시, 그대로 출력
-      document.getElementById('deviceInfo').innerText = String(info);
-    }
-  }
-};
+                // 2. 이미지 fetch 후 blob 변환
+                const response = await fetch(qrUrl);
+                const blob = await response.blob();
 
-  </script>
+                // 3. Blob → Base64 변환
+                const base64DataUrl = await blobToBase64(blob);
+
+                // 4. 미리보기
+                const preview = document.getElementById("preview");
+                preview.src = base64DataUrl;
+
+                // 5. iOS에 전달
+                const messageBody = {
+                    imageData: base64DataUrl
+                };
+                window.webkit.messageHandlers.imageDownloadBLOB.postMessage(JSON.stringify(messageBody));
+            } catch (error) {
+                console.error("QR 처리 중 오류:", error);
+            }
+        });
+
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result); // data:image/png;base64,...
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+    </script>
 </body>
 </html>

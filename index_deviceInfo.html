@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Device Info Viewer</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    #deviceInfo {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      white-space: pre-wrap;
+    }
+    button {
+      margin-top: 20px;
+      padding: 8px 12px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📱 Device Info</h1>
+
+  <button onclick="requestDeviceInfo()">Get Device Info</button>
+
+  <div id="deviceInfo">No device info yet.</div>
+
+  <script>
+    function requestDeviceInfo() {
+      if (window.webkit?.messageHandlers?.getDeviceInfo) {
+        window.webkit.messageHandlers.getDeviceInfo.postMessage(null);
+      } else {
+        document.getElementById('deviceInfo').innerText = "getDeviceInfo() is not available.";
+      }
+    }
+
+    // iOS Native에서 호출할 함수 (response 전달용)
+    window.NativeInterface = {
+  onDeviceInfoResponse: function(info) {
+    try {
+      const infoText = JSON.stringify(info, null, 2);
+      document.getElementById('deviceInfo').innerText = infoText;
+    } catch (e) {
+      // info가 객체가 아니거나 JSON.stringify 실패 시, 그대로 출력
+      document.getElementById('deviceInfo').innerText = String(info);
+    }
+  }
+};
+
+  </script>
+</body>
+</html>
