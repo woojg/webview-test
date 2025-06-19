@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # 푸시할 수 있게 권한 설정
+
 jobs:
   generate-folders-json:
     runs-on: ubuntu-latest
