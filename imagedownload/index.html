@@ -1,72 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>QR 이미지 저장 테스트</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR 이미지 저장 테스트</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 16px;
+      font-size: 16px;
+    }
+
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 8px 0;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      background-color: #007AFF;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:active {
+      background-color: #005FCC;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      margin-top: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-    <h1>QR 이미지 저장 테스트</h1>
+  <h1>QR 이미지 저장 테스트</h1>
 
-    <button id="save-blob-button">QR 저장 (Blob → Base64)</button>
-    <button id="save-url-button">QR 저장 (Image URL)</button>
-    <br/><br/>
+  <button id="save-blob-button">QR 저장 (Blob → Base64)</button>
+  <button id="save-url-button">QR 저장 (Image URL)</button>
 
-    <input type="text"
-           id="image-url-input"
-           style="width: 90%; padding: 8px; margin-bottom: 10px;"
-           placeholder="https://api.qrserver.com/v1/create-qr-code/?data=HelloFromMyrealtrip&size=200x200" />
-    <br/>
+  <input type="text" id="image-url-input"
+         placeholder="https://api.qrserver.com/v1/create-qr-code/?data=HelloFromMyrealtrip&size=200x200" />
 
-    <img id="preview" alt="QR 미리보기" width="200" height="200" style="border:1px solid #ccc;" />
+  <img id="preview" alt="QR 미리보기" />
 
-    <script>
-        const defaultImageUrl = "https://api.qrserver.com/v1/create-qr-code/?data=HelloFromMyrealtrip&size=200x200";
+  <script>
+    const defaultImageUrl = "https://api.qrserver.com/v1/create-qr-code/?data=HelloFromMyrealtrip&size=200x200";
+    document.getElementById("preview").src = defaultImageUrl;
 
-        // 초기 미리보기 설정
-        document.getElementById("preview").src = defaultImageUrl;
+    document.getElementById("save-blob-button").addEventListener("click", async () => {
+      const imageUrl = getInputUrlOrDefault();
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const base64DataUrl = await blobToBase64(blob);
+        window.webkit.messageHandlers.downloadImageWithBlob.postMessage(
+          JSON.stringify({ imageData: base64DataUrl })
+        );
+        document.getElementById("preview").src = imageUrl;
+      } catch (error) {
+        console.error("⚠️ Blob 저장 오류:", error);
+      }
+    });
 
-        // Blob 방식 저장
-        document.getElementById("save-blob-button").addEventListener("click", async () => {
-            const imageUrl = getInputUrlOrDefault();
-            try {
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
-                const base64DataUrl = await blobToBase64(blob);
+    document.getElementById("save-url-button").addEventListener("click", () => {
+      const imageUrl = getInputUrlOrDefault();
+      window.webkit.messageHandlers.downloadImageWithUrl.postMessage(
+        JSON.stringify({ imageUrl })
+      );
+      document.getElementById("preview").src = imageUrl;
+    });
 
-                const messageBody = { imageData: base64DataUrl };
-                window.webkit.messageHandlers.downloadImageWithBlob.postMessage(JSON.stringify(messageBody));
+    function getInputUrlOrDefault() {
+      const input = document.getElementById("image-url-input").value.trim();
+      return input !== "" ? input : defaultImageUrl;
+    }
 
-                document.getElementById("preview").src = imageUrl;
-            } catch (error) {
-                console.error("⚠️ Blob 저장 오류:", error);
-            }
-        });
-
-        // URL 방식 저장 (JSON 형식으로 전달)
-        document.getElementById("save-url-button").addEventListener("click", () => {
-            const imageUrl = getInputUrlOrDefault();
-
-            const messageBody = { imageUrl: imageUrl };
-            window.webkit.messageHandlers.downloadImageWithUrl.postMessage(JSON.stringify(messageBody));
-
-            document.getElementById("preview").src = imageUrl;
-        });
-
-        // 입력값 또는 기본 URL 반환
-        function getInputUrlOrDefault() {
-            const input = document.getElementById("image-url-input").value.trim();
-            return input !== "" ? input : defaultImageUrl;
-        }
-
-        // Blob → Base64 변환
-        function blobToBase64(blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        }
-    </script>
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+  </script>
 </body>
 </html>
