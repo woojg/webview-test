@@ -1,3 +1,5 @@
 [
   {"name": "Device Info", "path": "device-info"}
+,
+  {"name": "Imagedownload", "path": "imagedownload"}
 ]
