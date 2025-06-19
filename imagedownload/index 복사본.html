@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QR 이미지 미리보기 & 저장</title>
+</head>
+<body>
+    <h1>QR 이미지 미리보기 & 저장</h1>
+
+    <button id="save-button">QR 이미지 저장</button>
+    <br/><br/>
+
+    <img id="preview" alt="QR 미리보기" width="200" height="200" style="border:1px solid #ccc;" />
+
+    <script>
+        document.getElementById("save-button").addEventListener("click", async () => {
+            try {
+                // 1. QR 이미지 URL (샘플 QR 코드)
+                const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?data=HelloMyrealtrip&size=200x200";
+
+                // 2. 이미지 fetch 후 blob 변환
+                const response = await fetch(qrUrl);
+                const blob = await response.blob();
+
+                // 3. Blob → Base64 변환
+                const base64DataUrl = await blobToBase64(blob);
+
+                // 4. 미리보기
+                const preview = document.getElementById("preview");
+                preview.src = base64DataUrl;
+
+                // 5. iOS에 전달
+                const messageBody = {
+                    imageData: base64DataUrl
+                };
+                window.webkit.messageHandlers.imageDownloadBLOB.postMessage(JSON.stringify(messageBody));
+            } catch (error) {
+                console.error("QR 처리 중 오류:", error);
+            }
+        });
+
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result); // data:image/png;base64,...
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+    </script>
+</body>
+</html>
