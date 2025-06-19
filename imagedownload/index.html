@@ -33,24 +33,22 @@
                 const blob = await response.blob();
                 const base64DataUrl = await blobToBase64(blob);
 
-                // 이미지 전달
                 const messageBody = { imageData: base64DataUrl };
                 window.webkit.messageHandlers.downloadImageWithBlob.postMessage(JSON.stringify(messageBody));
 
-                // 미리보기 갱신
                 document.getElementById("preview").src = imageUrl;
             } catch (error) {
                 console.error("⚠️ Blob 저장 오류:", error);
             }
         });
 
-        // URL 방식 저장
+        // URL 방식 저장 (JSON 형식으로 전달)
         document.getElementById("save-url-button").addEventListener("click", () => {
             const imageUrl = getInputUrlOrDefault();
-            const messageBody = { imageUrl: imageUrl };
-            window.webkit.messageHandlers.downloadImageWithUrl.postMessage(messageBody);
 
-            // 미리보기 갱신
+            const messageBody = { imageUrl: imageUrl };
+            window.webkit.messageHandlers.downloadImageWithUrl.postMessage(JSON.stringify(messageBody));
+
             document.getElementById("preview").src = imageUrl;
         });
 
