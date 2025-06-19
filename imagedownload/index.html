@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QR 이미지 저장 테스트</title>
   <style>
     body {
@@ -16,9 +16,15 @@
       margin-bottom: 20px;
     }
 
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
     button {
       padding: 12px 20px;
-      margin: 8px 0;
       font-size: 1em;
       border: none;
       border-radius: 8px;
@@ -54,9 +60,12 @@
 <body>
   <h1>QR 이미지 저장 테스트</h1>
 
-  <button id="save-blob-button">iOS QR 저장 (Blob → Base64)</button>
-  <button id="save-url-button">iOS QR 저장 (Image URL)</button>
-  <button id="android-save-blob-button">Android QR 저장 (Blob → Base64)</button>
+  <div class="button-group">
+    <button id="save-blob-button">iOS QR 저장 (Blob → Base64)</button>
+    <button id="save-url-button">iOS QR 저장 (Image URL)</button>
+    <button id="android-save-blob-button">Android QR 저장 (Blob → Base64)</button>
+    <button id="android-save-url-button">Android QR 저장 (Image URL)</button>
+  </div>
 
   <input type="text" id="image-url-input"
          placeholder="https://api.qrserver.com/v1/create-qr-code/?data=HelloFromMyrealtrip&size=200x200" />
@@ -99,11 +108,18 @@
         const response = await fetch(imageUrl);
         const blob = await response.blob();
         const base64DataUrl = await blobToBase64(blob);
-        AndroidTravler.downloadImageWithBlob(base64DataUrl); // ✅ Android 인터페이스 호출
+        AndroidTravler.downloadImageWithBlob(base64DataUrl);
         document.getElementById("preview").src = imageUrl;
       } catch (error) {
         console.error("⚠️ Android Blob 저장 오류:", error);
       }
+    });
+
+    // ✅ Android URL 방식
+    document.getElementById("android-save-url-button").addEventListener("click", () => {
+      const imageUrl = getInputUrlOrDefault();
+      AndroidTravler.downloadImageWithUrl(imageUrl);
+      document.getElementById("preview").src = imageUrl;
     });
 
     function getInputUrlOrDefault() {
