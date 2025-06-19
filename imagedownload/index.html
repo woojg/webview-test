@@ -35,7 +35,7 @@
 
                 // 이미지 전달
                 const messageBody = { imageData: base64DataUrl };
-                window.webkit.messageHandlers.downloadImageFromBlob.postMessage(JSON.stringify(messageBody));
+                window.webkit.messageHandlers.downloadImageWithBlob.postMessage(JSON.stringify(messageBody));
 
                 // 미리보기 갱신
                 document.getElementById("preview").src = imageUrl;
@@ -48,7 +48,7 @@
         document.getElementById("save-url-button").addEventListener("click", () => {
             const imageUrl = getInputUrlOrDefault();
             const messageBody = { imageUrl: imageUrl };
-            window.webkit.messageHandlers.downloadImageFromUrl.postMessage(messageBody);
+            window.webkit.messageHandlers.downloadImageWithUrl.postMessage(messageBody);
 
             // 미리보기 갱신
             document.getElementById("preview").src = imageUrl;
