@@ -54,8 +54,9 @@
 <body>
   <h1>QR 이미지 저장 테스트</h1>
 
-  <button id="save-blob-button">QR 저장 (Blob → Base64)</button>
-  <button id="save-url-button">QR 저장 (Image URL)</button>
+  <button id="save-blob-button">iOS QR 저장 (Blob → Base64)</button>
+  <button id="save-url-button">iOS QR 저장 (Image URL)</button>
+  <button id="android-save-blob-button">Android QR 저장 (Blob → Base64)</button>
 
   <input type="text" id="image-url-input"
          placeholder="https://api.qrserver.com/v1/create-qr-code/?data=HelloFromMyrealtrip&size=200x200" />
@@ -66,6 +67,7 @@
     const defaultImageUrl = "https://api.qrserver.com/v1/create-qr-code/?data=HelloFromMyrealtrip&size=200x200";
     document.getElementById("preview").src = defaultImageUrl;
 
+    // iOS Blob 방식
     document.getElementById("save-blob-button").addEventListener("click", async () => {
       const imageUrl = getInputUrlOrDefault();
       try {
@@ -77,16 +79,31 @@
         );
         document.getElementById("preview").src = imageUrl;
       } catch (error) {
-        console.error("⚠️ Blob 저장 오류:", error);
+        console.error("⚠️ iOS Blob 저장 오류:", error);
       }
     });
 
+    // iOS URL 방식
     document.getElementById("save-url-button").addEventListener("click", () => {
       const imageUrl = getInputUrlOrDefault();
       window.webkit.messageHandlers.downloadImageWithUrl.postMessage(
         JSON.stringify({ imageUrl })
       );
       document.getElementById("preview").src = imageUrl;
+    });
+
+    // Android Blob 방식
+    document.getElementById("android-save-blob-button").addEventListener("click", async () => {
+      const imageUrl = getInputUrlOrDefault();
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const base64DataUrl = await blobToBase64(blob);
+        AndroidTravler.downloadImageWithBlob(base64DataUrl); // ✅ Android 인터페이스 호출
+        document.getElementById("preview").src = imageUrl;
+      } catch (error) {
+        console.error("⚠️ Android Blob 저장 오류:", error);
+      }
     });
 
     function getInputUrlOrDefault() {
