@@ -1,0 +1,39 @@
+name: Update folders.json
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-folders-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Generate folders.json
+        run: |
+          echo "[" > folders.json
+          FIRST=true
+          for dir in */ ; do
+            if [ -f "${dir}index.html" ]; then
+              if [ "$FIRST" = false ]; then
+                echo "," >> folders.json
+              fi
+              NAME=$(echo "$dir" | sed 's#/##')
+              TITLE=$(echo "$NAME" | sed -r 's/[-_]/ /g' | sed -r 's/\b(.)/\u\1/g')
+              echo "  {\"name\": \"${TITLE}\", \"path\": \"${NAME}\"}" >> folders.json
+              FIRST=false
+            fi
+          done
+          echo "]" >> folders.json
+
+      - name: Commit and Push folders.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add folders.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update folders.json via GitHub Actions"
+          git push
