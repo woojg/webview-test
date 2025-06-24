@@ -56,19 +56,19 @@
   </div>
 
   <input type="text" id="file-url-input"
-         placeholder="https://example.com/path/to/your/file.pdf" />
+         placeholder="https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf" />
 
   <script>
     const defaultFileUrl = "https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf";
 
     document.getElementById("ios-download-button").addEventListener("click", () => {
       const fileUrl = getInputUrlOrDefault();
-      window.webkit.messageHandlers.downloadFileWithUrl.postMessage(fileUrl);
+      window.webkit.messageHandlers.downloadFile.postMessage(fileUrl);
     });
 
     document.getElementById("android-download-button").addEventListener("click", () => {
       const fileUrl = getInputUrlOrDefault();
-      AndroidTraveler.downloadFileWithUrl(fileUrl);
+      AndroidTraveler.downloadFile(fileUrl);
     });
 
     function getInputUrlOrDefault() {
