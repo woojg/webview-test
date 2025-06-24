@@ -83,7 +83,9 @@
         const response = await fetch(imageUrl);
         const blob = await response.blob();
         const base64DataUrl = await blobToBase64(blob);
-        window.webkit.messageHandlers.downloadImageWithBlob.postMessage(base64DataUrl);
+        window.webkit.messageHandlers.downloadImageWithBlob.postMessage(
+          JSON.stringify({ imageData: base64DataUrl })
+        );
         document.getElementById("preview").src = imageUrl;
       } catch (error) {
         console.error("⚠️ iOS Blob 저장 오류:", error);
@@ -93,7 +95,9 @@
     // iOS URL 방식
     document.getElementById("save-url-button").addEventListener("click", () => {
       const imageUrl = getInputUrlOrDefault();
-      window.webkit.messageHandlers.downloadImageWithUrl.postMessage(imageUrl);
+      window.webkit.messageHandlers.downloadImageWithUrl.postMessage(
+        JSON.stringify({ imageUrl })
+      );
       document.getElementById("preview").src = imageUrl;
     });
 
