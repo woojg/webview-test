@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GNB Tester</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 20px;
+      margin-top: 30px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>GNB</h1>
+
+  <h2>Refresh</h2>
+  <button id="toggleRefreshBtn" onclick="toggleRefresh()">Enable Refresh</button>
+
+  <script>
+    let isRefreshEnabled = false;
+
+    function updateButtonUI() {
+      const button = document.getElementById('toggleRefreshBtn');
+      button.innerText = isRefreshEnabled ? "Disable Refresh" : "Enable Refresh";
+    }
+
+    function toggleRefresh() {
+      isRefreshEnabled = !isRefreshEnabled;
+
+      // JS -> Native로 메시지 전송
+      if (window.webkit?.messageHandlers?.setRefreshEnabled) {
+        window.webkit.messageHandlers.setRefreshEnabled.postMessage(isRefreshEnabled);
+      } else {
+        console.warn("setRefreshEnabled not available.");
+      }
+
+      updateButtonUI();
+    }
+
+    // 초기 UI 상태 설정
+    updateButtonUI();
+  </script>
+
+</body>
+</html>
