@@ -44,7 +44,11 @@
 
       // JS -> Native로 메시지 전송
       if (window.webkit?.messageHandlers?.setRefreshEnabled) {
-        window.webkit.messageHandlers.setRefreshEnabled.postMessage(isRefreshEnabled);
+          if (isRefreshEnabled == true) {
+              window.webkit.messageHandlers.setRefreshEnabled.postMessage("true");
+          } else {
+              window.webkit.messageHandlers.setRefreshEnabled.postMessage("false");
+          }
       } else {
         console.warn("setRefreshEnabled not available.");
       }
