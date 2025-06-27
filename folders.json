@@ -3,6 +3,8 @@
 ,
   {"name": "DownloadFile", "path": "downloadFile"}
 ,
+  {"name": "Gnb", "path": "gnb"}
+,
   {"name": "Imagedownload", "path": "imagedownload"}
 ,
   {"name": "Imagedownload Json", "path": "imagedownload_json"}
